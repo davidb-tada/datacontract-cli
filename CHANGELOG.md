@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added JSON output format for test results (`--output-format json`)
+- Added `datacontract diff` command for semantic diff of two ODCS v3 data contract YAML files, with plain-text and HTML report formats. Breaking change classification (which changes are breaking vs non-breaking) will follow in a subsequent PR.
 
 ## [0.11.5] - 2026-02-19
 

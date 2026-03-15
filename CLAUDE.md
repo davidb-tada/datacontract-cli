@@ -104,7 +104,14 @@ The Data Contract CLI is an open-source command-line tool for working with data 
 
 5. **Linting (`datacontract/lint/`)**: Tools for validating data contract files against schema and best practices.
 
-6. **Breaking Change Detection (`datacontract/breaking/`)**: Logic for identifying breaking changes between versions.
+6. **Breaking Change Detection (`datacontract/breaking/`)**: Semantic diff engine and report renderers for ODCS data contracts.
+   - `diff.py`: Loads and normalizes two ODCS YAMLs (converting named lists to stable-keyed dicts), then diffs them with DeepDiff.
+   - `report_renderer.py`: Converts the raw DeepDiff result into a `report_data` dict; handles path rollup for the summary section.
+   - `text_report_renderer.py`: Renders the `report_data` dict as a fixed-width plain-text report.
+   - `html_report_renderer.py`: Renders the `report_data` dict as a self-contained HTML report.
+   - `helpers.py`: Shared constants (`LIST_CONTAINERS`) and utilities (`_flatten_value`, `_check_list_containers`) used by all renderers.
+
+   **Normalization — planned improvement**: The natural keys used to match list items (e.g. `schema[].name`, `customProperties[].property`) are currently hardcoded in `diff.py` as a 20-line path-to-key table, backed by six helper methods (`_normalize_by`, `_normalize_schema_fields`, `_normalize_quality`, `_normalize_auth_defs`, `_normalize_relationships`, `_normalize_properties`). The intended long-term fix is to encode these natural keys directly in the ODCS JSON Schema — as an `x-natural-key` extension or similar — and carry that through to the upstream `open-data-contract-standard` Pydantic models (via a `__natural_key__` class var or `Field` annotation). This is an improvement beyond just simplifying this code: it makes the identity semantics of each model explicit and authoritative in the schema itself, rather than having them implied by convention or rediscovered by downstream consumers. Once that lands, all six helpers and the key table collapse into a single ~15-line recursive function that walks the model tree by reflection — adding or changing a list field in the ODCS schema would require no changes here. See the `NOTE` in `ContractDiff._normalize()` for the exact upstream change required.
 
 ### Extension Pattern
 

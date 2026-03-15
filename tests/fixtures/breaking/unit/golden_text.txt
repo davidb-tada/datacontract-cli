@@ -1,0 +1,39 @@
+====================================================================================================
+                                      ODCS Data Contract Diff                                       
+
+v1.yaml → v2.yaml                                                                                   
+
+Generated: 2025-01-01 00:00:00 UTC                                                                  
+====================================================================================================
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  CHANGE SUMMARY  ·  3 change(s)  [ 1 Removed ]  [ 1 Changed ]  [ 1 Added ]
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+Field                                 Change
+-----------------------------------------------
+schema.customers                      Added
+schema.orders.properties.customer_id  Removed
+slaProperties.availability            Changed
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  CHANGE DETAILS
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+Field                Change   New                           Old
+----------------------------------------------------------------------------------------------------
+schema
+  - customers        Added                                  
+    physicalName     Added    customers_tbl                 
+    properties       Added                                  
+      - customer_id  Added                                  
+        logicalType  Added    string                        
+        required     Added    True                          
+  - orders
+    properties
+      - customer_id  Removed                                
+        logicalType  Removed                                string
+        required     Removed                                True
+slaProperties
+  - availability
+    value            Changed  99.5%                         99.9%

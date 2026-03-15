@@ -33,3 +33,64 @@ def test_export_jsonschema_dcs():
         expected_json_schema = file.read()
     print(expected_json_schema)
     assert response.text == expected_json_schema
+
+
+def _diff_v1():
+    with open("fixtures/breaking/integration/report_renderer_integration_v1.yaml", "r") as f:
+        return f.read()
+
+
+def _diff_v2():
+    with open("fixtures/breaking/integration/report_renderer_integration_v2.yaml", "r") as f:
+        return f.read()
+
+
+def test_diff_text_default():
+    response = client.post(
+        url="/diff",
+        json={"v1": _diff_v1(), "v2": _diff_v2()},
+    )
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/plain")
+    assert "ODCS Data Contract Diff" in response.text
+    assert "CHANGE SUMMARY" in response.text
+    assert "CHANGE DETAILS" in response.text
+
+
+def test_diff_text_explicit():
+    response = client.post(
+        url="/diff?format=text",
+        json={"v1": _diff_v1(), "v2": _diff_v2()},
+    )
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/plain")
+    assert "ODCS Data Contract Diff" in response.text
+
+
+def test_diff_html():
+    response = client.post(
+        url="/diff?format=html",
+        json={"v1": _diff_v1(), "v2": _diff_v2()},
+    )
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")
+    assert "<!DOCTYPE html>" in response.text
+    assert "ODCS Data Contract Diff" in response.text
+
+
+def test_diff_identical_contracts():
+    v1 = _diff_v1()
+    response = client.post(
+        url="/diff",
+        json={"v1": v1, "v2": v1},
+    )
+    assert response.status_code == 200
+    assert "No changes detected." in response.text
+
+
+def test_diff_invalid_format():
+    response = client.post(
+        url="/diff?format=pdf",
+        json={"v1": _diff_v1(), "v2": _diff_v2()},
+    )
+    assert response.status_code == 422
